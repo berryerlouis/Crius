@@ -1,0 +1,4 @@
+.vs/*
+*.atsuo
+Drone/Debug
+Drone/Release
