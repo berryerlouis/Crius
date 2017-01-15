@@ -63,7 +63,7 @@ struct
 static Boolean CmpVenux638LPXInit ( void )
 {
 	//uart init
-	return DrvUartInit( UART_GPS, UART_SPEED_115200 );
+	return DrvUartInit( E_UART_2, UART_SPEED_115200 );
 }
 
 static Boolean CmpVenux638LPXReadData( void )
@@ -78,12 +78,12 @@ static Boolean CmpVenux638LPXReadData( void )
 		venus638lpxData.satellites = 0U;
 	}
 
-	Int16U nbDataAvailable = DrvUartDataAvailable(UART_GPS);
+	Int16U nbDataAvailable = DrvUartDataAvailable(E_UART_2);
 
 	for(Int16U loop = 0U; loop < nbDataAvailable ; loop++)
 	{
 		//get the data
-		Int8U data = DrvUartReadData( UART_GPS );
+		Int8U data = DrvUartReadData( E_UART_2 );
 		switch ((Int8U)status)
 		{
 			case GPS_STATE_WAIT_PREFIX:

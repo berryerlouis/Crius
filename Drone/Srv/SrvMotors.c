@@ -69,10 +69,10 @@ Boolean SrvMotorsInit ( void )
 	motors.frontLeft.speed	= MOTOR_POWER_MIN;
 	
 	
-	motors.rearRight.servo	= DrvServoGetStruture(E_PWM_1);
-	motors.frontRight.servo	= DrvServoGetStruture(E_PWM_2);
-	motors.rearLeft.servo	= DrvServoGetStruture(E_PWM_3);
-	motors.frontLeft.servo	= DrvServoGetStruture(E_PWM_4);
+	motors.rearRight.servo	= DrvServoGetStruture(E_SOFT_PWM_1);
+	motors.frontRight.servo	= DrvServoGetStruture(E_SOFT_PWM_2);
+	motors.rearLeft.servo	= DrvServoGetStruture(E_SOFT_PWM_3);
+	motors.frontLeft.servo	= DrvServoGetStruture(E_SOFT_PWM_4);
 	
 	return TRUE;
 }	
@@ -94,16 +94,17 @@ void SrvMotorsDispatcher (void)
 	}
 	else
 	{
-		//on met la vitesse de tout les moteurs à zeros 
+		//reset les valeurs des pid
 		SrvPIDResetValues();
+		//on met la vitesse de tout les moteurs au min 
 		motors.rearRight.speed	= motors.minThrottle;
 		motors.frontRight.speed	= motors.minThrottle;
 		motors.rearLeft.speed	= motors.minThrottle;
 		motors.frontLeft.speed	= motors.minThrottle;
-		SrvMotorsSetSpeed( E_PWM_1 , motors.minThrottle );
-		SrvMotorsSetSpeed( E_PWM_2 , motors.minThrottle );
-		SrvMotorsSetSpeed( E_PWM_3 , motors.minThrottle );
-		SrvMotorsSetSpeed( E_PWM_4 , motors.minThrottle );
+		SrvMotorsSetSpeed( E_SOFT_PWM_1 , motors.minThrottle );
+		SrvMotorsSetSpeed( E_SOFT_PWM_2 , motors.minThrottle );
+		SrvMotorsSetSpeed( E_SOFT_PWM_3 , motors.minThrottle );
+		SrvMotorsSetSpeed( E_SOFT_PWM_4 , motors.minThrottle );
 	}
 
 }
@@ -160,10 +161,10 @@ void SrvMotorsUpdate(ErrorPid pid_error)
 														motors.frontLeft.startup,
 														motors.maxThrottle);
 		
-			SrvMotorsSetSpeed( E_PWM_1 , motors.rearRight.speed );
-			SrvMotorsSetSpeed( E_PWM_2 , motors.frontRight.speed );
-			SrvMotorsSetSpeed( E_PWM_3 , motors.rearLeft.speed );
-			SrvMotorsSetSpeed( E_PWM_4 , motors.frontLeft.speed );
+			SrvMotorsSetSpeed( E_SOFT_PWM_1 , motors.rearRight.speed );
+			SrvMotorsSetSpeed( E_SOFT_PWM_2 , motors.frontRight.speed );
+			SrvMotorsSetSpeed( E_SOFT_PWM_3 , motors.rearLeft.speed );
+			SrvMotorsSetSpeed( E_SOFT_PWM_4 , motors.frontLeft.speed );
 	
 		#endif
 	}
@@ -175,10 +176,10 @@ void SrvMotorsUpdate(ErrorPid pid_error)
 		motors.frontRight.speed	= motors.minThrottle;
 		motors.rearLeft.speed	= motors.minThrottle;
 		motors.frontLeft.speed	= motors.minThrottle;
-		SrvMotorsSetSpeed( E_PWM_1 , motors.minThrottle );
-		SrvMotorsSetSpeed( E_PWM_2 , motors.minThrottle );
-		SrvMotorsSetSpeed( E_PWM_3 , motors.minThrottle );
-		SrvMotorsSetSpeed( E_PWM_4 , motors.minThrottle );
+		SrvMotorsSetSpeed( E_SOFT_PWM_1 , motors.minThrottle );
+		SrvMotorsSetSpeed( E_SOFT_PWM_2 , motors.minThrottle );
+		SrvMotorsSetSpeed( E_SOFT_PWM_3 , motors.minThrottle );
+		SrvMotorsSetSpeed( E_SOFT_PWM_4 , motors.minThrottle );
 	}
 }	
 

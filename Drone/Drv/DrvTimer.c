@@ -41,23 +41,27 @@ void DrvTimerInitSystemTimer( void ) ;
 // Init du Drv Timer 
 void DrvTimerInit( void )
 {
-	//on configure les timers autre que le timer event
-	for(Int8U loop_index = 0U; loop_index < E_NB_TIMER ; loop_index++ )
+	//if timer is needed
+	if( E_NB_TIMER > 0U )
 	{
-		MesTimers[ loop_index ].enable = FALSE;
-		MesTimers[ loop_index ].ptrfct = NULL;
-	}	
-		
-	//on init le timer
-	TCCR2A	= 0U;
-	TCNT2	= 0U;
-	//prescaler Clk/128 => 0,000008 s => 8µs
-	BIT_HIGH(TCCR2B,CS20);
-	BIT_HIGH(TCCR2B,CS22);
-	//1ms
-	OCR2A   = TIMER2_OFFSET_COMPA;
-	BIT_HIGH(TIFR2,OCF2A);
-	BIT_HIGH(TIMSK2,OCIE2A);
+		//on configure les timers autre que le timer event
+		for(Int8U loop_index = 0U; loop_index < E_NB_TIMER ; loop_index++ )
+		{
+			MesTimers[ loop_index ].enable = FALSE;
+			MesTimers[ loop_index ].ptrfct = NULL;
+		}
+			
+		//on init le timer
+		TCCR2A	= 0U;
+		TCNT2	= 0U;
+		//prescaler Clk/128 => 0,000008 s => 8µs
+		BIT_HIGH(TCCR2B,CS20);
+		BIT_HIGH(TCCR2B,CS22);
+		//1ms
+		OCR2A   = TIMER2_OFFSET_COMPA;
+		BIT_HIGH(TIFR2,OCF2A);
+		BIT_HIGH(TIMSK2,OCIE2A);
+	}
 }
 
 	
@@ -103,13 +107,19 @@ void DrvTimerDelayTimer( Int8U index_timer , Int16U delay)
 //on reset tt les timers
 void DrvTimerTickReset(void)
 {
+	//stop IT
+	BIT_LOW(TIMSK2,OCIE2A);
+	//set the threshold
+	OCR2A   = TIMER2_OFFSET_COMPA;
 	//on configure les timers autre que le timer event
 	for(Int8U loop_index = 0U; loop_index < E_NB_TIMER ; loop_index++ )
 	{
 		MesTimers[ loop_index ].cpt_delay = 0U;	
 	}
+	//reset the counter
 	TCNT2	= 0U;
-	OCR2A   = TIMER2_OFFSET_COMPA;
+	//enable the IT
+	BIT_HIGH(TIMSK2,OCIE2A);
 }
 
 

@@ -33,7 +33,7 @@ typedef enum
 	READ_GYR,
 	READ_MAG,
 	READ_BAR,
-	//READ_VAR,
+	READ_VAR,
 	READ_US,
 	READ_NB_TASK,
 }E_SensorTasks;

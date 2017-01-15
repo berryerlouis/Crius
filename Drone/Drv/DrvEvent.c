@@ -4,9 +4,9 @@
  * Created: 28/06/2011 15:52:35
  *  Author: berryer
  */ 
-#include "Conf/conf_hard.h"
+#include "Conf/ConfHard.h"
 
-#include "DrvEvent.h"
+#include "Drv/DrvEvent.h"
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 static volatile Event_t event_flags = 0U;

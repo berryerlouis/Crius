@@ -40,7 +40,7 @@ multiWiiMessage outMessage = { .command =  0U, .crc = 0U, .direction = 0U, .size
 //return : TRUE si ok
 Boolean SrvMultiWiiInit ( void )
 {
-	return DrvUartInit( UART_COM, UART_SPEED_115200 );
+	return DrvUartInit( E_UART_1, UART_SPEED_115200 );
 }
 
 //Fonction de dispatching d'evenements
@@ -72,9 +72,9 @@ static void SrvMultiWiiSendMessage ( Int8U command, Int8U size, Int8U *data )
 	
 	for( Int8U loop = 0U; loop < 6U + outMessage.size ; loop++)
 	{
-		DrvUartFillTxBuffer(UART_COM, (Int8U)((Int8U*)(&outMessage))[loop]);
+		DrvUartFillTxBuffer(E_UART_1, (Int8U)((Int8U*)(&outMessage))[loop]);
 	}
-	DrvUartSendData(UART_COM);
+	DrvUartSendData(E_UART_1);
 }
 
 static void SrvMultiWiiDoMessage( void )
@@ -154,10 +154,10 @@ static void SrvMultiWiiDoMessage( void )
 				Int16U servo7;
 			} cmdServo;
 			
-			cmdServo.servo0 = DrvServoGetTicks(0) / TIMER1_TICKS_PER_US;
-			cmdServo.servo1 = DrvServoGetTicks(1) / TIMER1_TICKS_PER_US;
-			cmdServo.servo2 = DrvServoGetTicks(2) / TIMER1_TICKS_PER_US;
-			cmdServo.servo3 = DrvServoGetTicks(3) / TIMER1_TICKS_PER_US;
+			cmdServo.servo0 = DrvServoGetTicks(0);
+			cmdServo.servo1 = DrvServoGetTicks(1);
+			cmdServo.servo2 = DrvServoGetTicks(2);
+			cmdServo.servo3 = DrvServoGetTicks(3);
 			cmdServo.servo4 = 0U;
 			cmdServo.servo5 = 0U;
 			cmdServo.servo6 = 0U;
@@ -605,7 +605,7 @@ static Boolean SrvMultiWiiDecodeMessage()
 {
 	static Int8U cpt = 0U;
 	static multiwii_state_t status = MULTIWII_STATE_WAIT_PREAMBLE_0;
-	Int16U nbDataAvailable = DrvUartDataAvailable(UART_COM);
+	Int16U nbDataAvailable = DrvUartDataAvailable(E_UART_1);
 	//minimum message
 	if( nbDataAvailable >= 6U )
 	{
@@ -613,7 +613,7 @@ static Boolean SrvMultiWiiDecodeMessage()
 		for(Int16U loop = 0U; loop < nbDataAvailable ; loop++)
 		{
 			//get the data  
-			Int8U data = DrvUartReadData(UART_COM);
+			Int8U data = DrvUartReadData(E_UART_1);
 			
 			switch ((Int8U)status)
 			{

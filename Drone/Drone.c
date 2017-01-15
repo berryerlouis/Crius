@@ -58,11 +58,12 @@ int main(void)
 	DrvInterruptSetAllInterrupts();
 	
 	// ********************* Services init ********************************************
-	//SrvSensorsInit();
-	//SrvIhmInit();
-	//SrvMultiWiiInit();
-	//SrvPIDInit();
-	//SrvImuInit();
+	
+	SrvSensorsInit();
+	SrvIhmInit();
+	SrvMultiWiiInit();
+	SrvPIDInit();
+	SrvImuInit();
 	SrvMotorsInit();
 	
 	// ********************* Start IHM ************************************************
@@ -75,11 +76,6 @@ int main(void)
 	// ********************* Led ok blink mode ****************************************
 	SrvIhmPlatformInitDone();
 	
-	
-	//DrvIoSetPinOutput( E_ADC_PIN_0 );
-	static Int16U toto[4] = {600,900,1200,900};
-	static Int8U titi = 0;
-	static Int32U time = 0;
     while(TRUE)
     {		
 		// ********************* Watchdog ********************************************* 
@@ -91,32 +87,25 @@ int main(void)
 		lastLoopTime = now;
 		
 		// ********************* Calcul du temps de vie en sec ************************
-		imu.status.lifeTime = now / 1000000U;
-		
-		if(time < now)
+		if( (Int32U)(now / 40000U) - imu.status.lifeTime > 0UL )
 		{
-			time = now + 1000000;
-			//DrvServoSetPosition(0,tata);
-			DrvServoSetPosition(0,toto[titi++]);
-			if(titi == 4)titi=0;
+			
 		}
-		/*
+		imu.status.lifeTime = now / 1000000U;
+			
 		// ********************* Read sensors *****************************************
-		SrvSensorsDispatcher();		//1ms
+		SrvSensorsDispatcher();		
 		// ********************* IHM **************************************************
-		SrvIhmDispatcher();			//100탎
+		SrvIhmDispatcher();			
 		// ********************* Compute sensors **************************************
-		SrvImuDispatcher();			//500탎
+		SrvImuDispatcher();			
 		// ********************* PID compute ******************************************
-		SrvPIDDispatcher();			//500탎
+		SrvPIDDispatcher();			
 		// ********************* Update motors ******* ********************************
-		SrvMotorsDispatcher();		//120탎
+		SrvMotorsDispatcher();		
 		// ********************* Receive transmit data ********************************
-		SrvMultiWiiDispatcher();	//120탎
-		*/
+		SrvMultiWiiDispatcher();	
 		
-		
-		//toto = DrvAdcRead(E_ADC_PIN_0);
 	}	
 }
 

@@ -38,8 +38,6 @@ Boolean DrvAdcInit ( void )
 	BIT_HIGH(DIDR0,ADC6D);
 	BIT_HIGH(DIDR0,ADC7D);
 	
-	//enable ADC
-	BIT_HIGH(ADCSRA,ADEN);
 	//no start now
 	BIT_LOW(ADCSRA,ADSC);
 	//no auto trigger
@@ -51,6 +49,8 @@ Boolean DrvAdcInit ( void )
 	//division factor set to 8
 	BIT_HIGH(ADCSRA,ADPS0);
 	BIT_HIGH(ADCSRA,ADPS1);
+	//enable ADC
+	BIT_HIGH(ADCSRA,ADEN);
 	
 	return oSuccess;
 }
@@ -68,8 +68,8 @@ Int16S DrvAdcRead ( EIoPin pin )
 	}
 	
 	//
-	adc[E_ADC_PIN_0_ID].value = ADC;
-	return adc[E_ADC_PIN_0_ID].value;		
+	adc[E_ADC_1].value = ADC;
+	return adc[E_ADC_1].value;		
 }
 
 

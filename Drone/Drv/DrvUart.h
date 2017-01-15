@@ -14,7 +14,10 @@
 
 ////////////////////////////////////////////PUBLIC DEFINES/////////////////////////////////////////
 
-
+#define UART_PINS					{\
+											UART_1_PINS, /*E_UART_1			*/\
+											UART_2_PINS  /*E_UART_2			*/\
+}
 
 #define BUFFER_IN_OUT_MAX			64U
 

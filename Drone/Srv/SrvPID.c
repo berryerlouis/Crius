@@ -71,7 +71,7 @@ void SrvPIDDispatcher (void)
 	imu.pid_error.roulis	= SrvPIDCompute( 0U , imu.angles.roulis				, 0U/*imu.angles.roulis	*/			, interval_pid);
 	imu.pid_error.tangage	= SrvPIDCompute( 1U , imu.angles.tangage			, 0U/*imu.angles.tangage*/			, interval_pid);
 	imu.pid_error.lacet		= 0U;//SrvPIDCompute( 2U , imu.angles.lacet				, imu.angles.lacet				, interval_pid);
-	imu.pid_error.altitude	= SrvPIDCompute( 3U , imu.sensors->bar->altitude	, imu.sensors->bar->altitude	, interval_pid);
+	imu.pid_error.altitude	= SrvPIDCompute( 3U , imu.sensors->bar->altitude	, imu.sensors->bar->altitude		, interval_pid);
 }
 
 

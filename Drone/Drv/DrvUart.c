@@ -9,8 +9,10 @@
 
 #include "DrvUart.h"
 
-////////////////////////////////////////PRIVATE ENUMS/////////////////////////////////////////////
+////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
 #define MAX_BUFFER	255U
+#define UART_RX_PIN	0U
+#define UART_TX_PIN	1U
 
 ////////////////////////////////////////PRIVATE STRUCTURES////////////////////////////////////////
 typedef struct
@@ -29,7 +31,7 @@ typedef struct
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 static volatile UartRingBuffer uartRingBuffer[ E_NB_UARTS ];
-
+	
 /////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 // Init du Drv Uart 
 Boolean DrvUartInit( Int8U indexUart, UartBaudRate baudRate )
@@ -57,29 +59,30 @@ Boolean DrvUartInit( Int8U indexUart, UartBaudRate baudRate )
 	if(oSuccess == TRUE)
 	{
 		oSuccess = FALSE;
-		if(indexUart == E_UART_0)
-		{
+		if(indexUart == E_UART_1)
+		{			
 			UBRR0 = ubrr;
 			BIT_HIGH(UCSR0A,U2X0);		//double speed mode
 			BIT_HIGH(UCSR0B,RXEN0);		//enable RX
 			BIT_HIGH(UCSR0B,TXEN0);		//enable TX
-			BIT_HIGH(UCSR0B,RXCIE0);	//enable RX interrupt
+			BIT_HIGH(UCSR0C,UCSZ00);	//8 bits, no parity, 1 stop
 			BIT_LOW(UCSR0B,TXCIE0);		//disable TX interrupt
 			BIT_LOW(UCSR0B,UDRIE0);		//disable UDR interrupt
-			BIT_HIGH(UCSR0C,UCSZ00);	//8 bits, no parity, 1 stop
+			BIT_HIGH(UCSR0B,RXCIE0);	//enable RX interrupt
 						
 			oSuccess = TRUE;
 		}
-		else if(indexUart == E_UART_1)
+		else if(indexUart == E_UART_2)
 		{
 			UBRR1 = ubrr;
 			BIT_HIGH(UCSR1A,U2X1);		//double speed mode
 			BIT_HIGH(UCSR1B,RXEN1);		//enable RX
 			BIT_HIGH(UCSR1B,TXEN1);		//enable TX
+			BIT_HIGH(UCSR1C,UCSZ10);	//8 bits, no parity, 1 stop
 			BIT_HIGH(UCSR1B,RXCIE1);	//enable RX interrupt
 			BIT_LOW(UCSR1B,TXCIE1);		//disable TX interrupt
 			BIT_LOW(UCSR1B,UDRIE1);		//disable UDR interrupt
-			BIT_HIGH(UCSR1C,UCSZ10);	//8 bits, no parity, 1 stop
+			BIT_HIGH(UCSR1B,RXCIE1);	//enable RX interrupt
 						
 			oSuccess = TRUE;
 		}
@@ -106,21 +109,17 @@ Boolean DrvUartFillTxBuffer(Int8U indexUart, Int8U datum)
 Boolean DrvUartSendData(Int8U indexUart)
 {
 	Boolean oSuccess = FALSE;
-	if(indexUart == E_UART_0)
+	if(indexUart == E_UART_1)
 	{
-		#ifdef E_UART_0
-			//enable ISR UDRIE0
-			BIT_HIGH(UCSR0B,UDRIE0);
+		//enable ISR UDRIE0
+		BIT_HIGH(UCSR0B,UDRIE0);
 		oSuccess = TRUE;
-		#endif // E_UART_0
 	}
-	else if(indexUart == E_UART_1)
+	else if(indexUart == E_UART_2)
 	{
-		#ifdef E_UART_1
-			//enable ISR UDRIE1
-			BIT_HIGH(UCSR1B,UDRIE1);
+		//enable ISR UDRIE1
+		BIT_HIGH(UCSR1B,UDRIE1);
 		oSuccess = TRUE;
-		#endif // E_UART_1
 	}
 	return oSuccess;
 }
@@ -154,31 +153,31 @@ Int8U DrvUartDataUsedTXBuff(Int8U indexUart)
 
 ////////////////////////////////////////ISR FUNCTIONS/////////////////////////////////////////
 
-#ifdef E_UART_0
+#ifdef UART_1_PINS
 ISR(USART0_RX_vect)
 {
-	Int8U head = uartRingBuffer[E_UART_0].Rx.Head;
-	uartRingBuffer[E_UART_0].Rx.Buffer[head++] = UDR0;
+	Int8U head = uartRingBuffer[E_UART_1].Rx.Head;
+	uartRingBuffer[E_UART_1].Rx.Buffer[head++] = UDR0;
 	if (head >= MAX_BUFFER)
 	{
 		head = 0U;
 	}
-	uartRingBuffer[E_UART_0].Rx.Head = head;
+	uartRingBuffer[E_UART_1].Rx.Head = head;
 }
 
 ISR(USART0_UDRE_vect)
 {
-	Int8U tail = uartRingBuffer[E_UART_0].Tx.Tail;
-	if (uartRingBuffer[E_UART_0].Tx.Head != tail)
+	Int8U tail = uartRingBuffer[E_UART_1].Tx.Tail;
+	if (uartRingBuffer[E_UART_1].Tx.Head != tail)
 	{
 		if (++tail >= MAX_BUFFER)
 		{
 			tail = 0U;
 		}
-		UDR0 = uartRingBuffer[E_UART_0].Tx.Buffer[tail];
-		uartRingBuffer[E_UART_0].Tx.Tail = tail;
+		UDR0 = uartRingBuffer[E_UART_1].Tx.Buffer[tail];
+		uartRingBuffer[E_UART_1].Tx.Tail = tail;
 	}
-	if (tail == uartRingBuffer[E_UART_0].Tx.Head)
+	if (tail == uartRingBuffer[E_UART_1].Tx.Head)
 	{
 		BIT_LOW(UCSR0B,UDRIE0);
 	}
@@ -188,34 +187,34 @@ ISR(USART0_TX_vect)
 {
 
 }
-#endif // E_UART_0
+#endif // UART_1_PINS
 
 
-#ifdef E_UART_1
+#ifdef UART_2_PINS
 ISR(USART1_RX_vect)
 {
-	Int8U head = uartRingBuffer[E_UART_1].Rx.Head;
-	uartRingBuffer[E_UART_1].Rx.Buffer[head++] = UDR1;
+	Int8U head = uartRingBuffer[E_UART_2].Rx.Head;
+	uartRingBuffer[E_UART_2].Rx.Buffer[head++] = UDR1;
 	if (head >= MAX_BUFFER)
 	{
 		head = 0U;
 	}
-	uartRingBuffer[E_UART_1].Rx.Head = head;
+	uartRingBuffer[E_UART_2].Rx.Head = head;
 }
 
 ISR(USART1_UDRE_vect)
 {
-	Int8U tail = uartRingBuffer[E_UART_1].Tx.Tail;
-	if (uartRingBuffer[E_UART_1].Tx.Head != tail)
+	Int8U tail = uartRingBuffer[E_UART_2].Tx.Tail;
+	if (uartRingBuffer[E_UART_2].Tx.Head != tail)
 	{
 		if (++tail >= MAX_BUFFER)
 		{
 			tail = 0U;
 		}
-		UDR1 = uartRingBuffer[E_UART_1].Tx.Buffer[tail];
-		uartRingBuffer[E_UART_1].Tx.Tail = tail;
+		UDR1 = uartRingBuffer[E_UART_2].Tx.Buffer[tail];
+		uartRingBuffer[E_UART_2].Tx.Tail = tail;
 	}
-	if (tail == uartRingBuffer[E_UART_1].Tx.Head)
+	if (tail == uartRingBuffer[E_UART_2].Tx.Head)
 	{
 		BIT_LOW(UCSR1B,UDRIE1);	
 	}
@@ -225,4 +224,4 @@ ISR(USART1_TX_vect)
 {
 
 }
-#endif // E_UART_1
+#endif // UART_2_PINS

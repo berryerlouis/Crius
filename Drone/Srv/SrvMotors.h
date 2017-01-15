@@ -10,7 +10,7 @@
 #include "Conf/ConfHard.h"
 #include "Tools/tools_typedefs.h"
 
-#include "Drv/DrvPwm.h"
+#include "Drv/DrvPwmSoft.h"
 
 
 ////////////////////////////////////////////MOTORS MIN MAX////////////////////////////////////////////
@@ -24,7 +24,7 @@ typedef struct
 	Int8U	id;
 	Int16U	startup;
 	Int16U	speed;
-	Pwm	*servo;
+	PwmSoft	*servo;
 }Motor;
 
 typedef struct

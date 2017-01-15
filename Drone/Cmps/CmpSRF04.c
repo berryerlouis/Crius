@@ -38,13 +38,16 @@ UltraSonicFunctions srf04 =
 
 //definition de la structure des data ultrasonic pour le composant SRF04
 UltraSonicData srf04Data;
+
+EIoPin srf04Pins[ E_NB_USS ] = US_PINS ;
+
 /////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 
 //fonction init du capteur
 static Boolean CmpSRF04Init( void )
 {
-	DrvIoSetPinOutput(EIO_PIN_A_6);
-	DrvIoSetPinState(EIO_PIN_A_6,IO_LEVEL_LOW);
+	DrvIoSetPinOutput(srf04Pins[0U]);
+	DrvIoSetPinState(srf04Pins[0U],IO_LEVEL_LOW);
 	statusEcho = SEND_PULSE;
 	return TRUE;
 }
@@ -56,19 +59,19 @@ static Boolean CmpSRF04SendPulse( void )
 	if(statusEcho == SEND_PULSE)
 	{
 		//send a pulse 
-		DrvIoSetPinOutput(EIO_PIN_A_6);
-		DrvIoSetPinState(EIO_PIN_A_6,IO_LEVEL_HIGH);
+		DrvIoSetPinOutput(srf04Pins[0U]);
+		DrvIoSetPinState(srf04Pins[0U],IO_LEVEL_HIGH);
 		DrvTickDelayUs(10);
-		DrvIoSetPinState(EIO_PIN_A_6,IO_LEVEL_LOW);
+		DrvIoSetPinState(srf04Pins[0U],IO_LEVEL_LOW);
 		//wait for response from the SRF04
-		DrvIoSetPinInput(EIO_PIN_A_6);
+		DrvIoSetPinInput(srf04Pins[0U]);
 		
 		statusEcho = WAIT_RISING_EDGE;
 		
 		//enable ext int
 		BIT_HIGH(PCICR,PCIE0);
 		//pin mask int
-		BIT_HIGH(PCMSK0,PCINT6);
+		BIT_HIGH(PCMSK0,PCINT0);
 	}
 	return oSuccess;
 }
@@ -96,6 +99,6 @@ ISR(PCINT0_vect)
 		//disable ext int
 		BIT_LOW(PCICR,PCIE0);
 		//pin mask int
-		BIT_LOW(PCMSK0,PCINT6);
+		BIT_LOW(PCMSK0,PCINT0);
 	}
 }

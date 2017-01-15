@@ -22,6 +22,7 @@
 typedef struct
 {
 	Int16S variation;
+	float lastAltitude;
 } VariometerData;
 
 
@@ -35,7 +36,7 @@ typedef struct
 
 
 Boolean SnrVariometerInit				( void );
-Boolean SnrVariometerGetVariation     	( void );
+Int16S SnrVariometerGetVariation     	( float altitude );
 VariometerData* SnrVariometerGetStruct	( void );
 
 #endif //CMPVARIOMETER_H

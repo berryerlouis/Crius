@@ -9,12 +9,18 @@
 #include "DrvTwi.h"
 #include "DrvLed.h"
 
+
+////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
+#define I2C_SCL_PIN	0U
+#define I2C_SDA_PIN	1U
+
 ////////////////////////////////////////PRIVATE STRUCTURES/////////////////////////////////////////
 
 
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 //permits to get the number of errors count
 Int16U errorsCount = 0U;
+EIoPin i2cPins[ E_NB_I2CS ][2U] = {I2C_PINS} ;
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 //On attend la transmission   
@@ -28,6 +34,11 @@ static void DrvTwiWaitTransmission( void );
 Boolean DrvTwiInit( Int32U speed ) 
 {
 	Boolean o_success = TRUE;
+	
+	//set gpio to output for I2C
+	DrvIoSetPinOutput(i2cPins[ E_I2C_1 ][I2C_SCL_PIN]);
+	DrvIoSetPinOutput(i2cPins[ E_I2C_1 ][I2C_SDA_PIN]);
+	
 	TWBR =  (Int8U)((Int16U)((Int32U)(CONF_FOSC_HZ / speed ) - 16U) / 2U);	// change the I2C clock rate
 	TWSR =  0U;	                                        	// Not used. Driver presumes prescaler to be 00.
 	TWCR =	(1U<<TWEN) |                                	// Enable TWI-interface and release TWI pins.

@@ -5,33 +5,34 @@
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
 #define ADDR_EEPROM_CHECK_EEPROM	( Int8U *)0U
-#define ADDR_EEPROM_VERSION			( Int8U *)1U
-#define ADDR_EEPROM_ACC_CALIB_X		( Int8U *)2U
-#define ADDR_EEPROM_ACC_CALIB_Y		( Int8U *)4U
-#define ADDR_EEPROM_ACC_CALIB_Z		( Int8U *)6U
-#define ADDR_EEPROM_GYR_CALIB_X		( Int8U *)8U
-#define ADDR_EEPROM_GYR_CALIB_Y		( Int8U *)10U
-#define ADDR_EEPROM_GYR_CALIB_Z		( Int8U *)12U
-#define ADDR_EEPROM_MAG_CALIB_X		( Int8U *)14U
-#define ADDR_EEPROM_MAG_CALIB_Y		( Int8U *)16U
-#define ADDR_EEPROM_MAG_CALIB_Z		( Int8U *)18U
-#define ADDR_EEPROM_PID_X_P			( Int8U *)20U
-#define ADDR_EEPROM_PID_X_I			( Int8U *)24U
-#define ADDR_EEPROM_PID_X_D			( Int8U *)28U
-#define ADDR_EEPROM_PID_Y_P			( Int8U *)32U
-#define ADDR_EEPROM_PID_Y_I			( Int8U *)36U
-#define ADDR_EEPROM_PID_Y_D			( Int8U *)40U
-#define ADDR_EEPROM_PID_Z_P			( Int8U *)44U
-#define ADDR_EEPROM_PID_Z_I			( Int8U *)48U
-#define ADDR_EEPROM_PID_Z_D			( Int8U *)52U
-#define ADDR_EEPROM_PID_ALT_P		( Int8U *)56U
-#define ADDR_EEPROM_PID_ALT_I		( Int8U *)60U
-#define ADDR_EEPROM_PID_ALT_D		( Int8U *)64U
-#define ADDR_EEPROM_ALTITUDE		( Int8U *)66U
-#define ADDR_EEPROM_MOTOR_F_L		( Int8U *)70U
-#define ADDR_EEPROM_MOTOR_F_R		( Int8U *)72U
-#define ADDR_EEPROM_MOTOR_R_L		( Int8U *)74U
-#define ADDR_EEPROM_MOTOR_R_R		( Int8U *)76U
+#define ADDR_EEPROM_VERSION_SOFT	( Int8U *)1U
+#define ADDR_EEPROM_VERSION_HARD	( Int8U *)2U
+#define ADDR_EEPROM_ACC_CALIB_X		( Int8U *)3U
+#define ADDR_EEPROM_ACC_CALIB_Y		( Int8U *)5U
+#define ADDR_EEPROM_ACC_CALIB_Z		( Int8U *)7U
+#define ADDR_EEPROM_GYR_CALIB_X		( Int8U *)9U
+#define ADDR_EEPROM_GYR_CALIB_Y		( Int8U *)11U
+#define ADDR_EEPROM_GYR_CALIB_Z		( Int8U *)13U
+#define ADDR_EEPROM_MAG_CALIB_X		( Int8U *)15U
+#define ADDR_EEPROM_MAG_CALIB_Y		( Int8U *)17U
+#define ADDR_EEPROM_MAG_CALIB_Z		( Int8U *)19U
+#define ADDR_EEPROM_PID_X_P			( Int8U *)21U
+#define ADDR_EEPROM_PID_X_I			( Int8U *)25U
+#define ADDR_EEPROM_PID_X_D			( Int8U *)29U
+#define ADDR_EEPROM_PID_Y_P			( Int8U *)33U
+#define ADDR_EEPROM_PID_Y_I			( Int8U *)37U
+#define ADDR_EEPROM_PID_Y_D			( Int8U *)41U
+#define ADDR_EEPROM_PID_Z_P			( Int8U *)45U
+#define ADDR_EEPROM_PID_Z_I			( Int8U *)49U
+#define ADDR_EEPROM_PID_Z_D			( Int8U *)53U
+#define ADDR_EEPROM_PID_ALT_P		( Int8U *)57U
+#define ADDR_EEPROM_PID_ALT_I		( Int8U *)61U
+#define ADDR_EEPROM_PID_ALT_D		( Int8U *)65U
+#define ADDR_EEPROM_ALTITUDE		( Int8U *)67U
+#define ADDR_EEPROM_MOTOR_F_L		( Int8U *)71U
+#define ADDR_EEPROM_MOTOR_F_R		( Int8U *)73U
+#define ADDR_EEPROM_MOTOR_R_L		( Int8U *)75U
+#define ADDR_EEPROM_MOTOR_R_R		( Int8U *)77U
 
 
 #define VAL_EEPROM_CHECK_OK			0U
@@ -65,6 +66,7 @@ Boolean DrvEepromInit ( void )
 {
 	Boolean oSuccess = FALSE;
 	
+	//check if first time init or corruption
 	val = DrvEepromReadByte( ADDR_EEPROM_CHECK_EEPROM );
 	if( val == VAL_EEPROM_CHECK_OK )
 	{
@@ -72,8 +74,10 @@ Boolean DrvEepromInit ( void )
 	}
 	else
 	{
-		//on ecrit la version 
-		DrvEepromWriteByte(ADDR_EEPROM_VERSION, VERSION);
+		//on ecrit la version software
+		DrvEepromWriteByte(ADDR_EEPROM_VERSION_SOFT, VERSION_SOFTWARE);
+		//on ecrit la version hardware
+		DrvEepromWriteByte(ADDR_EEPROM_VERSION_HARD, VERSION_HARDWARE);
 	}
 
 	return oSuccess;
@@ -110,7 +114,7 @@ Boolean DrvEepromIsConfigured ( void )
 //retourne le numero de version
 void DrvEepromReadVersion ( Int8U *version )
 {
-	version[ 0U ] = DrvEepromReadByte( ADDR_EEPROM_VERSION );
+	version[ 0U ] = DrvEepromReadByte( ADDR_EEPROM_VERSION_SOFT );
 }
 
 //retourne les config de l'accelerometre

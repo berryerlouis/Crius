@@ -35,8 +35,6 @@ float magnetoCounter = 0.0F;
 Int32U magnetoCounterRead = 0U;
 float intervalBaro = 0.0F;
 Int32U lastreadBaro = 0U;
-float intervalVario = 0.0F;
-Int32U lastreadVario = 0U;
 
 //available sensors
 Sensors sensors;
@@ -52,9 +50,6 @@ Boolean SrvSensorsInit( void )
 	sensors.status.taskToDo = READ_GPS;
 	sensors.status.error = READ_NOTHING;
 	
-	
-//init des composants
-#ifdef DAISY_7 
 	
 	//accelerometer
 	if(TRUE == SnrAccelerometerInit(ACC_1G_TO_2G))
@@ -125,24 +120,6 @@ Boolean SrvSensorsInit( void )
 	{
 		return FALSE;
 	}
-#endif
-#ifdef CRIUS 
-	
-	//CmpBMA180Init();
-	//CmpITG3205Init();
-	//magnetometer
-	if(TRUE == SnrMagnetometerInit(MAG_1_3GA))
-	{
-		sensors.mag = SnrMagnetometerGetStruct();
-	}
-	//barometer
-	if(TRUE == SnrBarometerInit())
-	{
-		sensors.bar = SnrBarometerGetStruct();
-	}
-	
-#endif
-
 	return SrvSensorsSensorsCalibration();
 }
 
@@ -184,12 +161,12 @@ void SrvSensorsDispatcher (void)
 			SrvSensorsReadBarometerSensor();
 			break;
 		}
-		/*case READ_VAR:
+		case READ_VAR:
 		{
 			//read baro & temp
 			SrvSensorsReadVariometerSensor();
 			break;
-		}*/
+		}
 		case READ_US:
 		{
 			//read us
@@ -284,7 +261,7 @@ Boolean SrvSensorsSensorsCalibration( void )
 
 
 /************************************************************************/
-/*Lecture accelerometer                                                 */
+/*Lecture Accelerometer                                                 */
 /************************************************************************/
 static void SrvSensorsReadAccelerometerSensor( void )
 {
@@ -392,7 +369,7 @@ static void SrvSensorsReadBarometerSensor( void )
 }
 
 /************************************************************************/
-/*Lecture GPS															*/
+/*Lecture Ultrasonic													*/
 /************************************************************************/
 static void SrvSensorsReadUltraSonicSensor( void )
 {
@@ -408,21 +385,10 @@ static void SrvSensorsReadGPSSensor( void )
 }
 
 /************************************************************************/
-/*Lecture VAriometer													*/
+/*Lecture Variometer													*/
 /************************************************************************/
 static void SrvSensorsReadVariometerSensor( void )
 {
-	// ********************* Calcul du temps de cycle *************************
-	//Int32U nowVario = DrvTickGetTimeUs();
-	//intervalVario = (float)(nowVario - lastreadVario) / 1000000.0F;
-	//lastreadVario = nowVario;
-			
-	// Integrator - velocity, cm/sec
-	//sensors.var->variation = (Int16S)(((Int32S)sensors.acc->rawData.z - (Int32S)0x3FFF) * (9.80665F / 10000.0F / 0x3FFF) * intervalVario);
-
-	// apply Complimentary Filter to keep the calculated velocity based on baro velocity (i.e. near real velocity).
-	// By using CF it's possible to correct the drift of integrated accZ (velocity) without loosing the phase, i.e without delay
-	//sensors.var->variation = sensors.var->variation * 0.985F + baroVel * 0.015F;
-	
+	SnrVariometerGetVariation( sensors.bar->altitude );
 }
 /////////////////////////////////////ISR PRIVATE FUNCTIONS////////////////////////////////////////

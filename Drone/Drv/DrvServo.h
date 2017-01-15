@@ -10,7 +10,7 @@
 #define DRV_SERVO_H_
 
 #include "Tools/tools_typedefs.h"
-#include "Drv/DrvPwm.h"
+#include "Drv/DrvPwmSoft.h"
 ////////////////////////////////////////////PUBLIC DEFINES///////////////////////////////////////////
 
 
@@ -19,12 +19,11 @@
 #define SERVO_ANGLE_MIN			0U
 #define SERVO_ANGLE_MAX			1800U
 
-#define PULSE_WIDTH_MIN			800U	//탎
+#define PULSE_WIDTH_MIN			500U	//탎
 #define PULSE_WIDTH_MID			1500U	//탎
-#define PULSE_WIDTH_MAX			2400U	//탎
+#define PULSE_WIDTH_MAX			2300U	//탎
 
-#define PERIOD_SERVO_MAX		15000U 
-#define TICKS_PERIOD_SERVO		PERIOD_SERVO_MAX * TIMER1_TICKS_PER_US   
+#define PERIOD_SERVO_MAX		15000U  //탎
 
 
 
@@ -40,7 +39,7 @@ Boolean DrvServoSetPosition( Int8U index, Int16U angle ) ;
 Int16U DrvServoGetTicks( Int8U index ) ;
 
 // get the servo strucutre
-Pwm* DrvServoGetStruture( Int8U index ) ;
+PwmSoft* DrvServoGetStruture( Int8U index ) ;
 
 
 #endif /* DRV_SERVO_H_ */
