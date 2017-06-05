@@ -1,14 +1,14 @@
 ////////////////////////////////////////INCLUDES//////////////////////////////////////////////////
-#include "Conf\ConfHard.h"
+#include "Conf/ConfHard.h"
 
-#include "DrvIo.h"
+#include "Drv/DrvIo.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
 
 ////////////////////////////////////////PRIVATE STRUCTURES////////////////////////////////////////
 static const SIoPin io_table[ EIO_NB_PIN ] =
 {
-	#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega644P__)
+	#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega644P__) || defined (__AVR_ATmega1284__)
 		{ &PORTA, &DDRA, &PINA, 0U},
 		{ &PORTA, &DDRA, &PINA, 1U},
 		{ &PORTA, &DDRA, &PINA, 2U},

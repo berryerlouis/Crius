@@ -31,15 +31,6 @@ Boolean SrvIhmInit ( void )
 {
     Boolean oSuccess = TRUE;
 
-	//init des drivers
-	DrvButtonInit();
-	DrvLedInit();
-	// ********************* Led init *************************************************
-	DrvLedSetPinLed(E_LED_OK);
-	DrvLedSetPinLed(E_LED_WARNING);
-	DrvLedSetPinLed(E_LED_ERROR);
-	// ********************* Button ***************************************************
-	DrvButtonAddButton(E_BUTTON_SETUP);
 	
 	intervalIhm = 0.0F;
 	lastreadIhm = 0U;
@@ -67,35 +58,6 @@ void SrvIhmDispatcher ( void )
 			SrvIhmPlatformDisarm();
 		}
 	}
-	
-	/*if( imu.status.armed == ARMED )
-	{
-		//Period
-		intervalIhm += DrvTickGetTimeUs() - lastreadIhm;
-		lastreadIhm = DrvTickGetTimeUs();
-	
-		//check if period is OK
-		if( intervalIhm > periodIhm )
-		{
-			//RAZ
-			intervalIhm = 0U;
-			DrvLedSetBlinkMode(E_LED_WARNING, tabHeartbeat[indexHeartbeat], tabHeartbeat[HEARTBEAT_INDEX_MAX] - tabHeartbeat[indexHeartbeat]);
-			if(upDown == FALSE)
-			{
-				if(++indexHeartbeat == HEARTBEAT_INDEX_MAX )
-				{
-					upDown = TRUE;
-				}
-			}
-			else
-			{
-				if(--indexHeartbeat == 0U )
-				{
-					upDown = FALSE;
-				}
-			}
-		}
-	}*/
 }
 
 //platform init start
@@ -119,8 +81,8 @@ void SrvIhmPlatformArm ( void )
 {
 	imu.status.armed	= ARMED;
 	periodIhm = HEARTBEAT_PERIOD_MIN;
-	DrvLedSetBlinkMode(E_LED_OK, 3U, 12U);
-	DrvLedSetState(E_LED_WARNING, E_LED_STATE_ON);
+	DrvLedSetBlinkMode(E_LED_OK, 125U, 125U);
+	DrvLedSetState(E_LED_WARNING, E_LED_STATE_OFF);
 	imu.moteurs->throttle = 100U;
 }
 //platform Disarm

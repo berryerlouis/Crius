@@ -13,6 +13,9 @@
 #include "Drv/DrvTimer.h"
 #include "Drv/DrvAdc.h"
 #include "Drv/DrvInterrupt.h"
+#include "Drv/DrvButton.h"
+#include "Drv/DrvLed.h"
+#include "Drv/DrvBootload.h"
 
 #include "Srv/SrvKalman.h"
 #include "Srv/SrvImu.h"
@@ -42,6 +45,12 @@ int main(void)
 	//reset status register
 	MCUSR = 0U;
 
+	// ********************* Interrupt Vectors ****************************************
+	/* Enable change of interrupt vectors */
+	MCUCR |= (1<<IVCE);
+	/* Move interrupts to app flash section */
+	MCUCR &= ~(1<<IVSEL);
+
 	// ********************* Interrupt Disable ****************************************
 	DrvInterruptClearAllInterrupts();
 	
@@ -53,18 +62,26 @@ int main(void)
 	DrvTimerInit();
 	DrvEepromInit();
 	DrvAdcInit();
+	DrvButtonInit();
+	DrvButtonAddButton(E_BUTTON_SETUP);
+	DrvLedInit();
+	DrvLedSetPinLed(E_LED_OK);
+	DrvLedSetPinLed(E_LED_WARNING);
+	DrvLedSetPinLed(E_LED_ERROR);
 	
 	// ********************* Interrupt Enable *****************************************
 	DrvInterruptSetAllInterrupts();
-	
+		
 	// ********************* Services init ********************************************
-	
 	SrvSensorsInit();
 	SrvIhmInit();
 	SrvMultiWiiInit();
 	SrvPIDInit();
 	SrvImuInit();
 	SrvMotorsInit();
+	
+	// ********************* Bootload init ********************************************
+	DrvBootloadAppInit();
 	
 	// ********************* Start IHM ************************************************
 	SrvIhmPlatformInitStart() ;

@@ -14,10 +14,10 @@ typedef struct SSLed
 	EIoPin pin;
 	ELedState state;
 	ELedMode mode;
-	Int8U cptOnStop;
-	Int8U cptOn;
-	Int8U cptOff;
-	Int8U cptOffStop;
+	Int16U cptOnStop;
+	Int16U cptOn;
+	Int16U cptOff;
+	Int16U cptOffStop;
 } SLed ;
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
@@ -161,7 +161,7 @@ Boolean DrvLedSetMode ( Int8U idLed, ELedMode mode )
 
 
 //Fonction de modification du mode de la led
-Boolean DrvLedSetBlinkMode ( Int8U idLed, Int8U delay_on , Int8U delay_off )
+Boolean DrvLedSetBlinkMode ( Int8U idLed, Int16U delay_on , Int16U delay_off )
 {
 	Boolean oSuccess = FALSE;
 	

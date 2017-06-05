@@ -11,9 +11,13 @@
 #include "Tools/tools_typedefs.h"
 
 ////////////////////////////////////////PUBLIC DEFINES////////////////////////////////////////////
-
+#define EEPROM_DEFAULT_VALUE	0xFFU
 ////////////////////////////////////////PUBLIC ENUMS//////////////////////////////////////////////
-
+typedef enum
+{
+	VAL_EEPROM_CHECK_RUN_APP	= 0x00U,
+	VAL_EEPROM_CHECK_RUN_BOOT	= 0x01U,
+}eepromRunMode;
 ////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
 
 ////////////////////////////////////////PUBLIC FUNCTIONS//////////////////////////////////////////
@@ -27,7 +31,10 @@ void DrvEepromDeconfigure ( void ) ;
 Boolean DrvEepromIsConfigured ( void ) ;
 
 //ecrit l'etat de config de l'eeprom
-void DrvEepromSetConfiguration ( Boolean configuration );
+void DrvEepromSetRunMode ( eepromRunMode configuration );
+
+//retourne l'etat de config de l'eeprom
+eepromRunMode DrvEepromGetRunMode ( void );
 
 //retourne le numero de version
 void DrvEepromReadVersion ( Int8U *verison );

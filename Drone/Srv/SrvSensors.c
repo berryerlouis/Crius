@@ -251,9 +251,8 @@ Boolean SrvSensorsSensorsCalibration( void )
 	#endif
 	
 	oSuccess = (calibrateAcc && calibrateGyr && calibrateMag) ? TRUE : FALSE;
-	//write eeprom all is OK
-	DrvEepromSetConfiguration( oSuccess );
-	return oSuccess;
+	
+	return oSuccess ;
 }
 
 

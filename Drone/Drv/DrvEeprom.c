@@ -1,7 +1,8 @@
 ////////////////////////////////////////INCLUDES//////////////////////////////////////////////////
-#include "Conf\ConfHard.h"
+#include "Conf/ConfHard.h"
 
-#include "DrvEeprom.h"
+#include "Drv/DrvEeprom.h"
+#include "Drv/DrvBootload.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
 #define ADDR_EEPROM_CHECK_EEPROM	( Int8U *)0U
@@ -33,10 +34,8 @@
 #define ADDR_EEPROM_MOTOR_F_R		( Int8U *)73U
 #define ADDR_EEPROM_MOTOR_R_L		( Int8U *)75U
 #define ADDR_EEPROM_MOTOR_R_R		( Int8U *)77U
+#define ADDR_EEPROM_APP_BOOT		( Int8U *)79U
 
-
-#define VAL_EEPROM_CHECK_OK			0U
-#define VAL_EEPROM_CHECK_NOK		0xFFU
 
 #define EEPROM_WRITE_ENABLE			TRUE
 
@@ -59,20 +58,16 @@ static void DrvEepromWriteFloat ( Int8U *addr, float value);
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 static Int8U val = 0U;
 
+
 ////////////////////////////////////////PUBILC FUNCTIONS//////////////////////////////////////////
 //Fonction d'initialisation
 //return : TRUE si ok
 Boolean DrvEepromInit ( void )
 {
-	Boolean oSuccess = FALSE;
+	Boolean oSuccess = TRUE;
 	
-	//check if first time init or corruption
-	val = DrvEepromReadByte( ADDR_EEPROM_CHECK_EEPROM );
-	if( val == VAL_EEPROM_CHECK_OK )
-	{
-		oSuccess = TRUE;	
-	}
-	else
+	//return from boot with OK
+	if( DrvEepromIsConfigured() != TRUE ) 
 	{
 		//on ecrit la version software
 		DrvEepromWriteByte(ADDR_EEPROM_VERSION_SOFT, VERSION_SOFTWARE);
@@ -86,29 +81,28 @@ Boolean DrvEepromInit ( void )
 //ecrit l'etat de config de l'eeprom
 void DrvEepromDeconfigure ( void )
 {	
-	for(Int16U loop = 0U ; loop < 1024U ; loop++)
+	for(Int16U loop = 0U ; loop < E2SIZE ; loop++)
 	{
-		DrvEepromWriteByte(( Int8U *)loop,VAL_EEPROM_CHECK_NOK);
+		DrvEepromWriteByte(( Int8U *)loop,EEPROM_DEFAULT_VALUE);
 	}
 }
 
 //ecrit l'etat de config de l'eeprom
-void DrvEepromSetConfiguration ( Boolean configuration )
+void DrvEepromSetRunMode ( eepromRunMode configuration )
 {
-	if( TRUE == configuration)
-	{
-		DrvEepromWriteByte(ADDR_EEPROM_CHECK_EEPROM,VAL_EEPROM_CHECK_OK);
-	}
-	else
-	{
-		DrvEepromWriteByte(ADDR_EEPROM_CHECK_EEPROM,VAL_EEPROM_CHECK_NOK);
-	}
+	DrvEepromWriteByte(ADDR_EEPROM_APP_BOOT,configuration);
+}
+
+//retourne l'etat de config de l'eeprom
+eepromRunMode DrvEepromGetRunMode ( void )
+{
+	return DrvEepromReadByte( ADDR_EEPROM_APP_BOOT );
 }
 
 //retourne l'etat de config de l'eeprom
 Boolean DrvEepromIsConfigured ( void )
 {
-	return DrvEepromReadByte( ADDR_EEPROM_CHECK_EEPROM ) == VAL_EEPROM_CHECK_OK ? TRUE : FALSE ;
+	return DrvEepromReadByte( ADDR_EEPROM_CHECK_EEPROM ) == EEPROM_DEFAULT_VALUE ? TRUE : FALSE ;
 }
 
 //retourne le numero de version

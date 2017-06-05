@@ -7,10 +7,10 @@
 
 #include "Conf/ConfHard.h"
 
-#include "DrvUart.h"
+#include "Drv/DrvUart.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define MAX_BUFFER	255U
+#define MAX_BUFFER	256U
 #define UART_RX_PIN	0U
 #define UART_TX_PIN	1U
 
@@ -94,7 +94,7 @@ Boolean DrvUartInit( Int8U indexUart, UartBaudRate baudRate )
 //rempli le buffer d'emission
 Boolean DrvUartFillTxBuffer(Int8U indexUart, Int8U datum)
 {
-	Int8U head = uartRingBuffer[indexUart].Tx.Head;
+	Int16U head = uartRingBuffer[indexUart].Tx.Head;
 	if (++head >= MAX_BUFFER)
 	{
 		head = 0U;
@@ -127,7 +127,7 @@ Boolean DrvUartSendData(Int8U indexUart)
 //recoit une donnée de la liaison série
 Int8U DrvUartReadData(Int8U indexUart)
 {
-	Int8U tail = uartRingBuffer[indexUart].Rx.Tail;
+	Int16U tail = uartRingBuffer[indexUart].Rx.Tail;
 	Int8U data = uartRingBuffer[indexUart].Rx.Buffer[tail];
 	if (uartRingBuffer[indexUart].Rx.Head != tail)
 	{
@@ -156,7 +156,7 @@ Int8U DrvUartDataUsedTXBuff(Int8U indexUart)
 #ifdef UART_1_PINS
 ISR(USART0_RX_vect)
 {
-	Int8U head = uartRingBuffer[E_UART_1].Rx.Head;
+	Int16U head = uartRingBuffer[E_UART_1].Rx.Head;
 	uartRingBuffer[E_UART_1].Rx.Buffer[head++] = UDR0;
 	if (head >= MAX_BUFFER)
 	{
@@ -167,7 +167,7 @@ ISR(USART0_RX_vect)
 
 ISR(USART0_UDRE_vect)
 {
-	Int8U tail = uartRingBuffer[E_UART_1].Tx.Tail;
+	Int16U tail = uartRingBuffer[E_UART_1].Tx.Tail;
 	if (uartRingBuffer[E_UART_1].Tx.Head != tail)
 	{
 		if (++tail >= MAX_BUFFER)
@@ -193,7 +193,7 @@ ISR(USART0_TX_vect)
 #ifdef UART_2_PINS
 ISR(USART1_RX_vect)
 {
-	Int8U head = uartRingBuffer[E_UART_2].Rx.Head;
+	Int16U head = uartRingBuffer[E_UART_2].Rx.Head;
 	uartRingBuffer[E_UART_2].Rx.Buffer[head++] = UDR1;
 	if (head >= MAX_BUFFER)
 	{
@@ -204,7 +204,7 @@ ISR(USART1_RX_vect)
 
 ISR(USART1_UDRE_vect)
 {
-	Int8U tail = uartRingBuffer[E_UART_2].Tx.Tail;
+	Int16U tail = uartRingBuffer[E_UART_2].Tx.Tail;
 	if (uartRingBuffer[E_UART_2].Tx.Head != tail)
 	{
 		if (++tail >= MAX_BUFFER)
