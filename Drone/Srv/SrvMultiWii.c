@@ -23,17 +23,22 @@ typedef enum {
 	MULTIWII_STATE_GOT_DATA,
 	MULTIWII_STATE_GOT_CRC,
 } multiwii_state_t;
+
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 //sent data to GS
 static void SrvMultiWiiSendMessage ( Int8U command, Int8U size, Int8U *data );
-////////////////////////////////////////ISR FUNCTIONS/////////////////////////////////////////////
 
+////////////////////////////////////////ISR FUNCTIONS/////////////////////////////////////////////
 //permits to decode the icomming data
 static Boolean SrvMultiWiiDecodeMessage( void );
 static void SrvMultiWiiDoMessage( void );
+
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 multiWiiMessage inMessage = { .command =  0U, .crc = 0U, .direction = 0U, .size = 0U };
 multiWiiMessage outMessage = { .command =  0U, .crc = 0U, .direction = 0U, .size = 0U };
+Int8U cptDataMessage = 0U;
+multiwii_state_t status = MULTIWII_STATE_WAIT_PREAMBLE_0;
+Int16U nbDataAvailable = 0U;
 
 ////////////////////////////////////////PUBILC FUNCTIONS//////////////////////////////////////////
 //Fonction d'initialisation
@@ -48,7 +53,6 @@ void SrvMultiWiiDispatcher ( void )
 {	
 	SrvMultiWiiDecodeMessage();
 }
-
 
 ////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 //sent data to GS
@@ -158,10 +162,10 @@ static void SrvMultiWiiDoMessage( void )
 			cmdServo.servo1 = DrvServoGetTicks(1);
 			cmdServo.servo2 = DrvServoGetTicks(2);
 			cmdServo.servo3 = DrvServoGetTicks(3);
-			cmdServo.servo4 = 0U;
-			cmdServo.servo5 = 0U;
-			cmdServo.servo6 = 0U;
-			cmdServo.servo7 = 0U;
+			cmdServo.servo4 = 500U;
+			cmdServo.servo5 = 500U;
+			cmdServo.servo6 = 500U;
+			cmdServo.servo7 = 500U;
 			SrvMultiWiiSendMessage(inMessage.command,sizeof(cmdServo),(Int8U*)&cmdServo);
 		}
 		break;
@@ -178,18 +182,24 @@ static void SrvMultiWiiDoMessage( void )
 				Int16U motor7;
 			} cmdMotor;
 			
-			/*if(imu.moteurs->rearRight.speed + 1000U >= 1800)
-			{
-				imu.moteurs->rearRight.speed 	= 0;
-			}*/
-			cmdMotor.motor0 = imu.moteurs->rearRight.speed + 1000U;
-			cmdMotor.motor1 = imu.moteurs->frontRight.speed + 1000U;
-			cmdMotor.motor2 = imu.moteurs->rearLeft.speed + 1000U;
-			cmdMotor.motor3 = imu.moteurs->frontLeft.speed + 1000U;
+			cmdMotor.motor0 = 0U;
+			cmdMotor.motor1 = 0U;
+			cmdMotor.motor2 = 0U;
+			cmdMotor.motor3 = 0U;
 			cmdMotor.motor4 = 0U;
 			cmdMotor.motor5 = 0U;
 			cmdMotor.motor6 = 0U;
 			cmdMotor.motor7 = 0U;
+			#ifdef BI
+			cmdMotor.motor0 = imu.moteurs->left.speed + 1000U;
+			cmdMotor.motor1 = imu.moteurs->right.speed + 1000U;
+			#endif
+			#ifdef QUADX
+			cmdMotor.motor0 = imu.moteurs->rearRight.speed + 1000U;
+			cmdMotor.motor1 = imu.moteurs->frontRight.speed + 1000U;
+			cmdMotor.motor2 = imu.moteurs->rearLeft.speed + 1000U;
+			cmdMotor.motor3 = imu.moteurs->frontLeft.speed + 1000U;
+			#endif
 			SrvMultiWiiSendMessage(inMessage.command,sizeof(cmdMotor),(Int8U*)&cmdMotor);
 		}
 		break;
@@ -332,7 +342,7 @@ static void SrvMultiWiiDoMessage( void )
 			cmdMisc.maxThrottle = imu.moteurs->maxThrottle;
 			cmdMisc.minCommand = 0U;
 			cmdMisc.failSafeThrottle = imu.moteurs->minThrottle;
-			cmdMisc.arm = 0U;
+			cmdMisc.arm = (Int16U)imu.status.armed;
 			cmdMisc.lifetime = imu.status.lifeTime;
 			cmdMisc.magDeclinaison = imu.sensors->mag->declination * 10U;
 			cmdMisc.vBatScale = 131U;
@@ -512,12 +522,12 @@ static void SrvMultiWiiDoMessage( void )
 				} cmdMisc;
 
 				cmdMisc.intPowerTrigger1 = (Int16U)((Int16U)(inMessage.data[1U]<<8U) + inMessage.data[0U]);
-				imu.moteurs->minThrottle = (Int16U)((Int16U)(inMessage.data[3U]<<8U) + inMessage.data[2U]) - 1000U;
-				imu.moteurs->maxThrottle = (Int16U)((Int16U)(inMessage.data[5U]<<8U) + inMessage.data[4U]);
+				imu.moteurs->minThrottle = (Int16U)((Int16U)(inMessage.data[3U]<<8U) + inMessage.data[2U]);
+				imu.moteurs->maxThrottle = 1000U; //(Int16U)((Int16U)(inMessage.data[5U]<<8U) + inMessage.data[4U]);
 				cmdMisc.minCommand =  (Int16U)((Int16U)(inMessage.data[7U]<<8U) + inMessage.data[6U]);
 				cmdMisc.failSafeThrottle =  (Int16U)((Int16U)(inMessage.data[9U]<<8U) + inMessage.data[8U]);
-				cmdMisc.arm = (Int16U)((Int16U)(inMessage.data[11U]<<8U) + inMessage.data[10U]);
-				imu.status.lifeTime = 0U;
+				imu.status.armed = (Int16U)((Int16U)(inMessage.data[11U]<<8U) + inMessage.data[10U]);
+				imu.status.lifeTime = (Int32U)((Int32U)(inMessage.data[15U]<<24U) + (Int32U)(inMessage.data[14U]<<16U) + (Int32U)(inMessage.data[13U]<<8U) + (Int32U)(inMessage.data[12U]));
 				imu.sensors->mag->declination = (float)((Int16U)(inMessage.data[17U]<<8U) + inMessage.data[16U]) / 10U;
 				cmdMisc.vBatScale = inMessage.data[15U];
 				cmdMisc.vBatThreshold1 = inMessage.data[16U];
@@ -525,6 +535,15 @@ static void SrvMultiWiiDoMessage( void )
 				cmdMisc.vBatCritical = inMessage.data[18U];
 
 				SrvMultiWiiSendMessage(inMessage.command,0U,NULL);
+				
+				if(imu.status.armed == TRUE)
+				{
+					SrvIhmPlatformArm();
+				}
+				else
+				{
+					SrvIhmPlatformDisarm();
+				}
 			}
 		}
 		break;
@@ -547,25 +566,35 @@ static void SrvMultiWiiDoMessage( void )
 				cmdServosConf[ i ].mid = (Int16U)inMessage.data[ (i * 7U) + 4U ];
 				cmdServosConf[ i ].rate = (Int8U)inMessage.data[ (i * 7U) + 5U ];
 			}
-
-			//rear right
-			imu.moteurs->rearRight.servo->min= cmdServosConf[ 0U ].min;
-			imu.moteurs->rearRight.servo->max= cmdServosConf[ 0U ].max;
-			imu.moteurs->rearRight.servo->mid= cmdServosConf[ 0U ].mid;
-			//front right
-			imu.moteurs->frontRight.servo->min= cmdServosConf[ 1U ].min;
-			imu.moteurs->frontRight.servo->max= cmdServosConf[ 1U ].max;
-			imu.moteurs->frontRight.servo->mid= cmdServosConf[ 1U ].mid;
-			//rear left
-			imu.moteurs->rearLeft.servo->min= cmdServosConf[ 2U ].min;
-			imu.moteurs->rearLeft.servo->max= cmdServosConf[ 2U ].max;
-			imu.moteurs->rearLeft.servo->mid= cmdServosConf[ 2U ].mid;
-			//front left
-			imu.moteurs->frontLeft.servo->min= cmdServosConf[ 3U ].min;
-			imu.moteurs->frontLeft.servo->max= cmdServosConf[ 3U ].max;
-			imu.moteurs->frontLeft.servo->mid= cmdServosConf[ 3U ].mid;
-
 			
+			#ifdef BI
+				//left
+				imu.moteurs->left.servo->min= cmdServosConf[ 0U ].min;
+				imu.moteurs->left.servo->max= cmdServosConf[ 0U ].max;
+				imu.moteurs->left.servo->mid= cmdServosConf[ 0U ].mid;
+				//right
+				imu.moteurs->right.servo->min= cmdServosConf[ 1U ].min;
+				imu.moteurs->right.servo->max= cmdServosConf[ 1U ].max;
+				imu.moteurs->right.servo->mid= cmdServosConf[ 1U ].mid;
+			#endif
+			#ifdef QUADX
+				//rear right
+				imu.moteurs->rearRight.servo->min= cmdServosConf[ 0U ].min;
+				imu.moteurs->rearRight.servo->max= cmdServosConf[ 0U ].max;
+				imu.moteurs->rearRight.servo->mid= cmdServosConf[ 0U ].mid;
+				//front right
+				imu.moteurs->frontRight.servo->min= cmdServosConf[ 1U ].min;
+				imu.moteurs->frontRight.servo->max= cmdServosConf[ 1U ].max;
+				imu.moteurs->frontRight.servo->mid= cmdServosConf[ 1U ].mid;
+				//rear left
+				imu.moteurs->rearLeft.servo->min= cmdServosConf[ 2U ].min;
+				imu.moteurs->rearLeft.servo->max= cmdServosConf[ 2U ].max;
+				imu.moteurs->rearLeft.servo->mid= cmdServosConf[ 2U ].mid;
+				//front left
+				imu.moteurs->frontLeft.servo->min= cmdServosConf[ 3U ].min;
+				imu.moteurs->frontLeft.servo->max= cmdServosConf[ 3U ].max;
+				imu.moteurs->frontLeft.servo->mid= cmdServosConf[ 3U ].mid;
+			#endif			
 			SrvMultiWiiSendMessage(inMessage.command,0U,NULL);
 		}
 		break;
@@ -603,82 +632,103 @@ static void SrvMultiWiiDoMessage( void )
 //permits to decode the icomming data
 static Boolean SrvMultiWiiDecodeMessage()
 {
-	static Int8U cpt = 0U;
-	static multiwii_state_t status = MULTIWII_STATE_WAIT_PREAMBLE_0;
-	Int16U nbDataAvailable = DrvUartDataAvailable(E_UART_1);
-	//minimum message
+	nbDataAvailable = DrvUartDataAvailable(E_UART_1);
+	//minimum message is 6 char lenght
 	if( nbDataAvailable >= 6U )
 	{
-		
+		//loop until the data is over
 		for(Int16U loop = 0U; loop < nbDataAvailable ; loop++)
 		{
-			//get the data  
-			Int8U data = DrvUartReadData(E_UART_1);
+			//get the datum
+			Int8U datum = DrvUartReadData(E_UART_1);
 			
 			switch ((Int8U)status)
 			{
 				case MULTIWII_STATE_WAIT_PREAMBLE_0:
-				if(data == MSP_PREAMBLE[ 0U ])
+				if(datum == MSP_PREAMBLE[ 0U ])
 				{
+					//save first preamble
 					inMessage.preamble[ 0U ] = MSP_PREAMBLE[ 0U ];
+					//go to next step
 					status    = MULTIWII_STATE_WAIT_PREAMBLE_1;
 				}
 				break;
 				case MULTIWII_STATE_WAIT_PREAMBLE_1:
-				if (data == MSP_PREAMBLE[ 1U ])
+				if (datum == MSP_PREAMBLE[ 1U ])
 				{
+					//save second preamble
 					inMessage.preamble[ 1U ] = MSP_PREAMBLE[ 1U ];
+					//go to next step
 					status    = MULTIWII_STATE_GOT_PREAMBLE;
 				}
 				break;
 				case MULTIWII_STATE_GOT_PREAMBLE:
-				if (data == MSP_DIRECTION_IN)
+				if (datum == MSP_DIRECTION_IN)
 				{
-					inMessage.direction = data;
+					//get the message direction
+					inMessage.direction = datum;
+					//go to next step
 					status    = MULTIWII_STATE_GOT_DIRECTION;
 				}
 				break;
 				case MULTIWII_STATE_GOT_DIRECTION:
 				{
-					inMessage.size = data;
-					inMessage.crc = data;
+					//get the message size
+					inMessage.size = datum;
+					//initialise CRC
+					inMessage.crc = datum;
+					//go to next step
 					status    = MULTIWII_STATE_GOT_SIZE;
 				}
 				break;
 				case MULTIWII_STATE_GOT_SIZE:
 				{
-					inMessage.command = data;
-					inMessage.crc ^= data;
-					cpt = 0U;
+					//get the message command
+					inMessage.command = datum;
+					//compute CRC
+					inMessage.crc ^= datum;
+					//reset the number of data in the message
+					cptDataMessage = 0U;
 					if(inMessage.size != 0U)
 					{
+						//go to next step
+						//message with payload
 						status    = MULTIWII_STATE_GOT_COMMAND;
 					}
 					else
 					{
+						//go to next step
+						//message without payload, only command
 						status    = MULTIWII_STATE_GOT_DATA;
 					}
 				}
 				break;
 				case MULTIWII_STATE_GOT_COMMAND:
 				{
-					inMessage.data[cpt] = data;
-					inMessage.crc ^= data;
-					cpt++;
-					if(cpt == inMessage.size)
+					//get data
+					inMessage.data[cptDataMessage] = datum;
+					//compute CRC
+					inMessage.crc ^= datum;
+					//incremente the number of data
+					cptDataMessage++;
+					//we finish to take data
+					if(cptDataMessage == inMessage.size)
 					{
-						cpt = 0U;
+						//go to next step
 						status    = MULTIWII_STATE_GOT_DATA;
 					}
 				}
 				break;
 				case MULTIWII_STATE_GOT_DATA:
 				{
-					if(inMessage.crc == data)
+					//check CRC
+					if(inMessage.crc == datum)
 					{
+						//do what the message want
 						SrvMultiWiiDoMessage();
 					}
 					//even if the frame is incorrect
+					//go to first waitting step
 					status    = MULTIWII_STATE_WAIT_PREAMBLE_0;
 				}
 				break;

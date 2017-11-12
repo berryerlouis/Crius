@@ -14,7 +14,7 @@
 ////////////////////////////////////////PUBLIC DEFINES////////////////////////////////////////////
 // Multiwii Serial Protocol 0
 #define MSP_VERSION              0
-#define MULTIWII_VERSION        240
+#define MULTIWII_VERSION         240
 //to multiwii developpers/committers : do not add new MSP messages without a proper argumentation/agreement on the forum
 //range id [50-99] won't be assigned and can therefore be used for any custom multiwii fork without further MSP id conflict
 

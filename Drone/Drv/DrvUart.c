@@ -10,9 +10,7 @@
 #include "Drv/DrvUart.h"
 
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
-#define MAX_BUFFER	256U
-#define UART_RX_PIN	0U
-#define UART_TX_PIN	1U
+#define MAX_BUFFER	255U
 
 ////////////////////////////////////////PRIVATE STRUCTURES////////////////////////////////////////
 typedef struct
@@ -128,7 +126,7 @@ Boolean DrvUartSendData(Int8U indexUart)
 Int8U DrvUartReadData(Int8U indexUart)
 {
 	Int16U tail = uartRingBuffer[indexUart].Rx.Tail;
-	Int8U data = uartRingBuffer[indexUart].Rx.Buffer[tail];
+	Int8U datum = uartRingBuffer[indexUart].Rx.Buffer[tail];
 	if (uartRingBuffer[indexUart].Rx.Head != tail)
 	{
 		if (++tail >= MAX_BUFFER)
@@ -137,17 +135,19 @@ Int8U DrvUartReadData(Int8U indexUart)
 		}
 		uartRingBuffer[indexUart].Rx.Tail = tail;
 	}
-	return data;
+	return datum;
 }
 
 Int8U DrvUartDataAvailable(Int8U indexUart)
 {
-	return ((Int8U)(uartRingBuffer[indexUart].Rx.Head - uartRingBuffer[indexUart].Rx.Tail))%MAX_BUFFER;
+	Int8U nbDataAvailable = uartRingBuffer[indexUart].Rx.Head - uartRingBuffer[indexUart].Rx.Tail;
+	return nbDataAvailable%MAX_BUFFER;
 }
 
 Int8U DrvUartDataUsedTXBuff(Int8U indexUart) 
 {
-	return ((Int8U)(uartRingBuffer[indexUart].Tx.Head - uartRingBuffer[indexUart].Tx.Tail))%MAX_BUFFER;
+	Int8U nbDataUsed = uartRingBuffer[indexUart].Tx.Head - uartRingBuffer[indexUart].Tx.Tail;
+	return nbDataUsed%MAX_BUFFER;
 }
 
 
@@ -156,7 +156,7 @@ Int8U DrvUartDataUsedTXBuff(Int8U indexUart)
 #ifdef UART_1_PINS
 ISR(USART0_RX_vect)
 {
-	Int16U head = uartRingBuffer[E_UART_1].Rx.Head;
+	Int8U head = uartRingBuffer[E_UART_1].Rx.Head;
 	uartRingBuffer[E_UART_1].Rx.Buffer[head++] = UDR0;
 	if (head >= MAX_BUFFER)
 	{
@@ -167,7 +167,7 @@ ISR(USART0_RX_vect)
 
 ISR(USART0_UDRE_vect)
 {
-	Int16U tail = uartRingBuffer[E_UART_1].Tx.Tail;
+	Int8U tail = uartRingBuffer[E_UART_1].Tx.Tail;
 	if (uartRingBuffer[E_UART_1].Tx.Head != tail)
 	{
 		if (++tail >= MAX_BUFFER)
@@ -193,7 +193,7 @@ ISR(USART0_TX_vect)
 #ifdef UART_2_PINS
 ISR(USART1_RX_vect)
 {
-	Int16U head = uartRingBuffer[E_UART_2].Rx.Head;
+	Int8U head = uartRingBuffer[E_UART_2].Rx.Head;
 	uartRingBuffer[E_UART_2].Rx.Buffer[head++] = UDR1;
 	if (head >= MAX_BUFFER)
 	{
@@ -204,7 +204,7 @@ ISR(USART1_RX_vect)
 
 ISR(USART1_UDRE_vect)
 {
-	Int16U tail = uartRingBuffer[E_UART_2].Tx.Tail;
+	Int8U tail = uartRingBuffer[E_UART_2].Tx.Tail;
 	if (uartRingBuffer[E_UART_2].Tx.Head != tail)
 	{
 		if (++tail >= MAX_BUFFER)

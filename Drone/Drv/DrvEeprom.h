@@ -16,7 +16,7 @@
 typedef enum
 {
 	VAL_EEPROM_CHECK_RUN_APP	= 0x00U,
-	VAL_EEPROM_CHECK_RUN_BOOT	= 0x01U,
+	VAL_EEPROM_CHECK_RUN_BOOT	= 0xFFU,
 }eepromRunMode;
 ////////////////////////////////////////PUBLIC STRUCTURES/////////////////////////////////////////
 
@@ -29,6 +29,9 @@ void DrvEepromDeconfigure ( void ) ;
 
 //retourne l'etat de config de l'eeprom
 Boolean DrvEepromIsConfigured ( void ) ;
+
+//l'eeprom est maintenant configurée, on place l'octet à une valeur differente de celle par defaut
+void DrvEepromSetConfiguration ( void );
 
 //ecrit l'etat de config de l'eeprom
 void DrvEepromSetRunMode ( eepromRunMode configuration );

@@ -6,7 +6,7 @@
 ////////////////////////////////////////PRIVATE DEFINES///////////////////////////////////////////
 
 ////////////////////////////////////////PRIVATE STRUCTURES////////////////////////////////////////
-static const SIoPin io_table[ EIO_NB_PIN ] =
+static const SIoPin ioTable[ EIO_NB_PIN ] =
 {
 	#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega644P__) || defined (__AVR_ATmega1284__)
 		{ &PORTA, &DDRA, &PINA, 0U},
@@ -55,7 +55,7 @@ Boolean DrvIoSetPinOutput ( EIoPin pin )
 	
 	if( pin < EIO_NB_PIN )
 	{
-		*(io_table[ pin ].ddr) |= (1 << io_table[ pin ].bit);
+		*(ioTable[ pin ].ddr) |= (1 << ioTable[ pin ].bit);
 		o_success = TRUE;
 	}
 	return o_success;
@@ -66,8 +66,8 @@ Boolean DrvIoSetPinInput ( EIoPin pin )
 	Boolean o_success = FALSE;
 	if( pin < EIO_NB_PIN )
 	{
-		*(io_table[ pin ].ddr) &=~ (1 << io_table[ pin ].bit);
-		*(io_table[ pin ].port) &=~ (1 << io_table[ pin ].bit);
+		*(ioTable[ pin ].ddr) &=~ (1 << ioTable[ pin ].bit);
+		*(ioTable[ pin ].port) &=~ (1 << ioTable[ pin ].bit);
 		o_success = TRUE;
 	}
 	return o_success;
@@ -77,8 +77,8 @@ EIOLevel DrvIoGetPinState ( EIoPin pin )
 {
 	EIOLevel pin_value = IO_LEVEL_LOW;
 
-	pin_value = *(io_table[pin].pin);
-	pin_value = pin_value >> io_table[pin].bit;
+	pin_value = *(ioTable[pin].pin);
+	pin_value = pin_value >> ioTable[pin].bit;
 	pin_value &= 0x01U;
 
 	return pin_value ;
@@ -89,11 +89,58 @@ void DrvIoSetPinState ( EIoPin pin , EIOLevel level)
 {
 	EIOLevel not_level = ((EIOLevel)(~level)) & 0x01U ;
 
-	*(io_table[pin].port) &= (Int8U)(~(Int8U)(not_level << (Int8U)io_table[pin].bit));
-	*(io_table[pin].port) |= (Int8U)( level << (Int8U)io_table[pin].bit );
+	*(ioTable[pin].port) &= (Int8U)(~(Int8U)(not_level << (Int8U)ioTable[pin].bit));
+	*(ioTable[pin].port) |= (Int8U)( level << (Int8U)ioTable[pin].bit );
 }
 
 void DrvIoTogglePinState( EIoPin pin )
 {
-	*(io_table[pin].port) ^= (1U << io_table[pin].bit);
+	*(ioTable[pin].port) ^= (1U << ioTable[pin].bit);
+}
+
+void DrvIoSetInterruptPin ( EIoPin pin )
+{
+	if(pin < EIO_PORT_A)
+	{
+		BIT_HIGH(PCICR,PCIE0);
+		BIT_HIGH(PCMSK0,ioTable[pin].bit);
+	}
+	else if(pin < EIO_PORT_B)
+	{
+		BIT_HIGH(PCICR,PCIE1);
+		BIT_HIGH(PCMSK1,ioTable[pin].bit);	
+	}
+	else if(pin < EIO_PORT_C)
+	{
+		BIT_HIGH(PCICR,PCIE2);
+		BIT_HIGH(PCMSK2,ioTable[pin].bit);	
+	}
+	else if(pin < EIO_PORT_D)
+	{
+		BIT_HIGH(PCICR,PCIE3);
+		BIT_HIGH(PCMSK3,ioTable[pin].bit);	
+	}
+}
+void DrvIoResetInterruptPin ( EIoPin pin )
+{	
+	if(pin < EIO_PORT_A)
+	{
+		BIT_LOW(PCICR,PCIE0);
+		BIT_LOW(PCMSK0,ioTable[pin].bit);
+	}
+	else if(pin < EIO_PORT_B)
+	{
+		BIT_LOW(PCICR,PCIE1);
+		BIT_LOW(PCMSK1,ioTable[pin].bit);	
+	}
+	else if(pin < EIO_PORT_C)
+	{
+		BIT_LOW(PCICR,PCIE2);
+		BIT_LOW(PCMSK2,ioTable[pin].bit);	
+	}
+	else if(pin < EIO_PORT_D)
+	{
+		BIT_LOW(PCICR,PCIE3);
+		BIT_LOW(PCMSK3,ioTable[pin].bit);	
+	}
 }

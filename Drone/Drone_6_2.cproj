@@ -26,7 +26,7 @@
     <com_atmel_avrdbg_tool_jtagicemkii>
       <ToolType>com.atmel.avrdbg.tool.jtagicemkii</ToolType>
       <ToolName>JTAGICE mkII</ToolName>
-      <ToolNumber>FFFF9304407C</ToolNumber>
+      <ToolNumber>0700000005F2</ToolNumber>
       <Channel>
         <host>127.0.0.1</host>
         <port>51057</port>
@@ -35,7 +35,7 @@
       <ToolOptions>
         <InterfaceName>JTAG</InterfaceName>
         <InterfaceProperties>
-          <JtagDbgClock>1014448</JtagDbgClock>
+          <JtagDbgClock>2000000</JtagDbgClock>
           <JtagProgClock>1000000</JtagProgClock>
           <IspClock>125000</IspClock>
           <JtagInChain>false</JtagInChain>
@@ -148,7 +148,7 @@
     <UseGdb>False</UseGdb>
     <avrtoolserialnumber>00A20001193A</avrtoolserialnumber>
     <avrdeviceexpectedsignature>0x1E9706</avrdeviceexpectedsignature>
-    <avrtoolinterfaceclock>200000</avrtoolinterfaceclock>
+    <avrtoolinterfaceclock>2000000</avrtoolinterfaceclock>
     <com_atmel_avrdbg_tool_avrdragon>
       <ToolOptions>
         <InterfaceProperties>

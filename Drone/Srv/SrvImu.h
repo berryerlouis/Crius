@@ -41,17 +41,17 @@ typedef struct
 
 typedef struct SS_imu
 {
-	Pid				*pid[ E_NB_PIDS ];
-	Sensors			*sensors;
-	Motors			*moteurs;
-	Angles		    angles;
-	ErrorPid		pid_error;
-	StatusImu		status;
+	Pid			*pid[ E_NB_PIDS ];
+	Sensors		*sensors;
+	Motors		*moteurs;
+	Angles		angles;
+	ErrorPid	pid_error;
+	StatusImu	status;
 }Imu;
 
 typedef struct SS_imu_desiree
 {
-	Angles	angles;
+	Angles		angles;
 	Int16S		altitude;
 	Boolean		maintient_altitude;
 }S_imu_desiree;

@@ -19,9 +19,6 @@
 											UART_2_PINS  /*E_UART_2			*/\
 }
 
-#define BUFFER_IN_OUT_MAX			64U
-
-
 #define ComputeBaudRate( baud )				(Int16U)( CONF_FOSC_HZ / ( (Int32U)baud * CONF_FOSC_MHZ ) - 1 )
 #define ComputeBaudRateDoubleSpeed( baud )	(Int16U)( CONF_FOSC_HZ / ( (Int32U)baud * (CONF_FOSC_MHZ/2) ) - 1 )
 

@@ -22,11 +22,6 @@
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
 static Pid pids[ E_NB_PIDS ] ;
 
-float error = 0.0F;
-float p_term = 0.0F;
-float i_term = 0.0F;
-float d_term = 0.0F;
-
 //variables de timming
 Int32U lastread_pid = 0U;
 float interval_pid = 0.0F;
@@ -34,7 +29,7 @@ float interval_pid = 0.0F;
 //Init des valeurs du pid
 void SrvPIDInit( void )
 {
-	float p = 0.0F;
+	float p = 0.1F;
 	float i = 0.0F;
 	float d = 0.0F;
 	Boolean eep_config = DrvEepromIsConfigured();
@@ -67,11 +62,15 @@ void SrvPIDDispatcher (void)
 	interval_pid = (float)(now_pid - lastread_pid) / 1000000.0F;
 	lastread_pid = now_pid;
 	
-	// ********************* PID **********************************************
-	imu.pid_error.roulis	= SrvPIDCompute( 0U , imu.angles.roulis				, 0U/*imu.angles.roulis	*/			, interval_pid);
-	imu.pid_error.tangage	= SrvPIDCompute( 1U , imu.angles.tangage			, 0U/*imu.angles.tangage*/			, interval_pid);
-	imu.pid_error.lacet		= 0U;//SrvPIDCompute( 2U , imu.angles.lacet				, imu.angles.lacet				, interval_pid);
-	imu.pid_error.altitude	= SrvPIDCompute( 3U , imu.sensors->bar->altitude	, imu.sensors->bar->altitude		, interval_pid);
+	#ifdef 	BI
+		imu.pid_error.roulis	= SrvPIDCompute( 0U , imu.angles.roulis				, 0U/*imu.angles.roulis	*/			, interval_pid);
+	#else
+		// ********************* PID **********************************************
+		imu.pid_error.roulis	= SrvPIDCompute( 0U , imu.angles.roulis				, 0U/*imu.angles.roulis	*/			, interval_pid);
+		imu.pid_error.tangage	= SrvPIDCompute( 1U , imu.angles.tangage			, 0U/*imu.angles.tangage*/			, interval_pid);
+		imu.pid_error.lacet		= 0U;//SrvPIDCompute( 2U , imu.angles.lacet				, imu.angles.lacet				, interval_pid);
+		imu.pid_error.altitude	= SrvPIDCompute( 3U , imu.sensors->bar->altitude	, imu.sensors->bar->altitude		, interval_pid);
+	#endif
 }
 
 
@@ -112,16 +111,24 @@ void SrvPIDResetValues( void )
 	}
 }
 
-Int16S SrvPIDCompute(Int8U index, Int16S targetPosition, Int16S currentPosition, float delta_time )
+static float pid_error = 0.0F;
+static float p_term = 0.0F;
+static float i_term = 0.0F;
+static float d_term = 0.0F;
+Int16S SrvPIDCompute(Int8U index, Int16S currentPosition, Int16S targetPosition, float delta_time )
 {	
+	pid_error = 0.0F;
+	p_term = 0.0F;
+	i_term = 0.0F;
+	d_term = 0.0F;
 	//determine l'erreur
-	error = (targetPosition - currentPosition );
+	pid_error = (targetPosition - currentPosition );
 	
 	//Calcul du terme P
-	p_term = (float)( pids[index].p * error );
+	p_term = (float)( pids[index].p * pid_error );
 	
 	//calcul de l'erreur intégré
-	pids[index].integratedError += error * delta_time ;
+	pids[index].integratedError += pid_error * delta_time ;
 
 	//limitation de l'erreur
 	float windupguard = 500.0F / pids[index].i ;

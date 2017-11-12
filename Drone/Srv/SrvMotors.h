@@ -33,10 +33,16 @@ typedef struct
 	Int16U minThrottle;
 	Int16U midThrottle;
 	Int16U maxThrottle;
-	Motor frontRight;
-	Motor frontLeft;
-	Motor rearRight;
-	Motor rearLeft;
+	#ifdef BI
+		Motor right;
+		Motor left;
+	#endif
+	#ifdef QUADX
+		Motor frontRight;
+		Motor frontLeft;
+		Motor rearRight;
+		Motor rearLeft;
+	#endif
 }Motors;
 
 

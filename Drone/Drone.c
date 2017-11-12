@@ -63,8 +63,10 @@ int main(void)
 	DrvEepromInit();
 	DrvAdcInit();
 	DrvButtonInit();
-	DrvButtonAddButton(E_BUTTON_SETUP);
 	DrvLedInit();
+	
+	// ********************* IHM system init ******************************************
+	DrvButtonAddButton(E_BUTTON_SETUP);
 	DrvLedSetPinLed(E_LED_OK);
 	DrvLedSetPinLed(E_LED_WARNING);
 	DrvLedSetPinLed(E_LED_ERROR);
@@ -73,57 +75,67 @@ int main(void)
 	DrvInterruptSetAllInterrupts();
 		
 	// ********************* Services init ********************************************
-	SrvSensorsInit();
-	SrvIhmInit();
-	SrvMultiWiiInit();
-	SrvPIDInit();
-	SrvImuInit();
-	SrvMotorsInit();
-	
-	// ********************* Bootload init ********************************************
-	DrvBootloadAppInit();
-	
-	// ********************* Start IHM ************************************************
-	SrvIhmPlatformInitStart() ;
-	
-	// ********************* Reset time ***********************************************
-	DrvTimerTickReset();
-	lastLoopTime = DrvTickGetTimeUs();
-	
-	// ********************* Led ok blink mode ****************************************
-	SrvIhmPlatformInitDone();
-	
-    while(TRUE)
-    {		
-		// ********************* Watchdog ********************************************* 
-		wdt_enable(WDTO_15MS);
+	if( FALSE == SrvSensorsInit() )
+	{		
+		DrvLedSetState(E_LED_ERROR, E_LED_STATE_ON);
+		while(TRUE);
+	}
+	else
+	{
+		SrvIhmInit();
+		SrvMultiWiiInit();
+		SrvPIDInit();
+		SrvImuInit();
+		SrvMotorsInit();
 		
-		// ********************* Calcul du temps de cycle *****************************
-		Int32U now = DrvTickGetTimeUs();
-		imu.status.loopTime = now - lastLoopTime;
-		lastLoopTime = now;
+		// ********************* Bootload init ********************************************
+		DrvBootloadAppInit();
 		
-		// ********************* Calcul du temps de vie en sec ************************
-		if( (Int32U)(now / 40000U) - imu.status.lifeTime > 0UL )
+		// ********************* Start IHM ************************************************
+		SrvIhmPlatformInitStart() ;
+		
+		// ********************* Reset time ***********************************************
+		DrvTimerTickReset();
+		lastLoopTime = DrvTickGetTimeUs();
+		
+		// ********************* Led ok blink mode ****************************************
+		SrvIhmPlatformInitDone();
+		
+		// ********************* Eeprom is now configured for next startup ****************
+		DrvEepromSetConfiguration();
+		
+		while(TRUE)
 		{
+			// ********************* Watchdog *********************************************
+			wdt_enable(WDTO_15MS);
+			
+			// ********************* Calcul du temps de cycle *****************************
+			Int32U now = DrvTickGetTimeUs();
+			imu.status.loopTime = now - lastLoopTime;
+			lastLoopTime = now;
+			
+			// ********************* Calcul du temps de vie en sec ************************
+			if( (Int32U)(now / 40000U) - imu.status.lifeTime > 0UL )
+			{
+				
+			}
+			imu.status.lifeTime = now / 1000000U;
+			
+			// ********************* Read sensors *****************************************
+			SrvSensorsDispatcher();
+			// ********************* IHM **************************************************
+			SrvIhmDispatcher();
+			// ********************* Compute sensors **************************************
+			SrvImuDispatcher();
+			// ********************* PID compute ******************************************
+			SrvPIDDispatcher();
+			// ********************* Update motors ******* ********************************
+			SrvMotorsDispatcher();
+			// ********************* Receive transmit data ********************************
+			SrvMultiWiiDispatcher();
 			
 		}
-		imu.status.lifeTime = now / 1000000U;
-			
-		// ********************* Read sensors *****************************************
-		SrvSensorsDispatcher();		
-		// ********************* IHM **************************************************
-		SrvIhmDispatcher();			
-		// ********************* Compute sensors **************************************
-		SrvImuDispatcher();			
-		// ********************* PID compute ******************************************
-		SrvPIDDispatcher();			
-		// ********************* Update motors ******* ********************************
-		SrvMotorsDispatcher();		
-		// ********************* Receive transmit data ********************************
-		SrvMultiWiiDispatcher();	
-		
-	}	
+	}
 }
 
 

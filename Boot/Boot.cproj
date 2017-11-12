@@ -134,79 +134,77 @@
   <ItemGroup>
     <Compile Include="..\Drone\Conf\ConfBoard.h">
       <SubType>compile</SubType>
-      <Link>Boot\Conf\ConfBoard.h</Link>
+      <Link>Conf\ConfBoard.h</Link>
     </Compile>
     <Compile Include="..\Drone\Conf\ConfHard.h">
       <SubType>compile</SubType>
-      <Link>Boot\Conf\ConfHard.h</Link>
+      <Link>Conf\ConfHard.h</Link>
     </Compile>
     <Compile Include="..\Drone\Drv\DrvBootload.c">
       <SubType>compile</SubType>
-      <Link>Boot\Boot\Drv\DrvBootload.c</Link>
+      <Link>Drv\DrvBootload.c</Link>
     </Compile>
     <Compile Include="..\Drone\Drv\DrvBootload.h">
       <SubType>compile</SubType>
-      <Link>Boot\Boot\Drv\DrvBootload.h</Link>
+      <Link>Drv\DrvBootload.h</Link>
     </Compile>
     <Compile Include="..\Drone\Drv\DrvEeprom.c">
       <SubType>compile</SubType>
-      <Link>Boot\Drv\DrvEeprom.c</Link>
+      <Link>Drv\DrvEeprom.c</Link>
     </Compile>
     <Compile Include="..\Drone\Drv\DrvEeprom.h">
       <SubType>compile</SubType>
-      <Link>Boot\Drv\DrvEeprom.h</Link>
+      <Link>Drv\DrvEeprom.h</Link>
     </Compile>
     <Compile Include="..\Drone\Drv\DrvInterrupt.h">
       <SubType>compile</SubType>
-      <Link>Boot\Drv\DrvInterrupt.h</Link>
+      <Link>Drv\DrvInterrupt.h</Link>
     </Compile>
     <Compile Include="..\Drone\Drv\DrvIo.c">
       <SubType>compile</SubType>
-      <Link>Boot\Drv\DrvIo.c</Link>
+      <Link>Drv\DrvIo.c</Link>
     </Compile>
     <Compile Include="..\Drone\Drv\DrvIo.h">
       <SubType>compile</SubType>
-      <Link>Boot\Drv\DrvIo.h</Link>
+      <Link>Drv\DrvIo.h</Link>
     </Compile>
     <Compile Include="..\Drone\Drv\DrvLed.c">
       <SubType>compile</SubType>
-      <Link>Boot\Boot\Drv\DrvLed.c</Link>
+      <Link>Drv\DrvLed.c</Link>
     </Compile>
     <Compile Include="..\Drone\Drv\DrvLed.h">
       <SubType>compile</SubType>
-      <Link>Boot\Boot\Drv\DrvLed.h</Link>
+      <Link>Drv\DrvLed.h</Link>
     </Compile>
     <Compile Include="..\Drone\Drv\DrvTimer.c">
       <SubType>compile</SubType>
-      <Link>Boot\Boot\Drv\DrvTimer.c</Link>
+      <Link>Drv\DrvTimer.c</Link>
     </Compile>
     <Compile Include="..\Drone\Drv\DrvTimer.h">
       <SubType>compile</SubType>
-      <Link>Boot\Boot\Drv\DrvTimer.h</Link>
+      <Link>Drv\DrvTimer.h</Link>
     </Compile>
     <Compile Include="..\Drone\Drv\DrvUart.c">
       <SubType>compile</SubType>
-      <Link>Boot\Drv\DrvUart.c</Link>
+      <Link>Drv\DrvUart.c</Link>
     </Compile>
     <Compile Include="..\Drone\Drv\DrvUart.h">
       <SubType>compile</SubType>
-      <Link>Boot\Drv\DrvUart.h</Link>
+      <Link>Drv\DrvUart.h</Link>
     </Compile>
     <Compile Include="..\Drone\Tools\tools_typedefs.h">
       <SubType>compile</SubType>
-      <Link>Boot\Tools\tools_typedefs.h</Link>
+      <Link>Tools\tools_typedefs.h</Link>
     </Compile>
     <Compile Include="Boot.c">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Boot\" />
-    <Folder Include="Boot\Boot\" />
-    <Folder Include="Boot\Boot\Drv\" />
-    <Folder Include="Boot\Conf\" />
-    <Folder Include="Boot\Drv\" />
-    <Folder Include="Boot\Tools\" />
+    <Folder Include="Drv\" />
+    <Folder Include="Conf\" />
+    <Folder Include="Drv\" />
+    <Folder Include="Tools\" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

@@ -56,7 +56,7 @@ static float DrvEepromReadFloat( const Int8U * addr );
 //enregistre les config du pid
 static void DrvEepromWriteFloat ( Int8U *addr, float value);
 ////////////////////////////////////////PRIVATE VARIABLES/////////////////////////////////////////
-static Int8U val = 0U;
+
 
 
 ////////////////////////////////////////PUBILC FUNCTIONS//////////////////////////////////////////
@@ -102,7 +102,14 @@ eepromRunMode DrvEepromGetRunMode ( void )
 //retourne l'etat de config de l'eeprom
 Boolean DrvEepromIsConfigured ( void )
 {
-	return DrvEepromReadByte( ADDR_EEPROM_CHECK_EEPROM ) == EEPROM_DEFAULT_VALUE ? TRUE : FALSE ;
+	return DrvEepromReadByte( ADDR_EEPROM_CHECK_EEPROM ) == EEPROM_DEFAULT_VALUE ? FALSE : TRUE ;
+}
+
+//l'eeprom est maintenant configurée, on place l'octet à une valeur differente de celle par defaut
+void DrvEepromSetConfiguration ( void )
+{
+	//configure is now ok
+	DrvEepromWriteByte(ADDR_EEPROM_CHECK_EEPROM,EEPROM_WRITE_ENABLE);
 }
 
 //retourne le numero de version

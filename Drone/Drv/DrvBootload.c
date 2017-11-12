@@ -81,18 +81,14 @@ void DrvBootloadBootInit( void )
 	//check eeprom status
 	if(DrvEepromGetRunMode() == VAL_EEPROM_CHECK_RUN_APP) 
 	{		
-		//clear interrupt
-		//DrvInterruptClearAllInterrupts();
-		//reset wdg
-		wdt_enable(WDTO_15MS);
+		/* Enable change of interrupt vectors */
+		MCUCR = (1<<IVCE);
+		/* Move interrupts to app flash section */
+		MCUCR &= ~(1<<IVSEL);
 		//go to App area
-		while(1);
+		startApp();
 	}
 	
-	
-	
-	
-	// ********************* Interrupt Vectors ****************************************
 	/* Enable change of interrupt vectors */
 	MCUCR = (1<<IVCE);
 	/* Move interrupts to boot flash section */

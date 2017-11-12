@@ -81,4 +81,6 @@ Boolean DrvIoSetPinInput ( EIoPin pin ) ;
 EIOLevel DrvIoGetPinState ( EIoPin pin );
 void DrvIoSetPinState ( EIoPin pin , EIOLevel level);
 void DrvIoTogglePinState( EIoPin pin );
+void DrvIoSetInterruptPin ( EIoPin pin );
+void DrvIoResetInterruptPin ( EIoPin pin );
 #endif /* DRV_IO_H_ */

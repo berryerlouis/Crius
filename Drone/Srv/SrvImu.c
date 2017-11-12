@@ -149,6 +149,10 @@ static void ComplementaryFilter1orderRoll(float accData, float gyrData, float lo
 	
 	float a = 0.0F;
 	float tau = 0.075F;
+	
+	//accData *= 10U;
+	//gyrData *= 10U;
+	
 	a=tau/(tau+looptime);
 	angleRoll = a* (angleRoll + gyrData * looptime) + (1-a) * (accData);
 	
@@ -162,7 +166,7 @@ static void ComplementaryFilter1orderRoll(float accData, float gyrData, float lo
 		indexRoll = 0U;
 	}
 	imu.angles.roulis = (Int16S)(totalRoll / NB_SMOOTH_ROLL);
-	imu.angles.roulis = imu.angles.roulis * 10U;
+	//imu.angles.roulis = imu.angles.roulis * 10U;
 }
 
 
@@ -175,6 +179,10 @@ static void ComplementaryFilter1orderPitch(float accData, float gyrData, float l
 	
 	float a = 0.0F;
 	float tau = 0.075F;
+	
+	//accData *= 10U;
+	//gyrData *= 10U;
+	
 	a=tau/(tau+looptime);
 	anglePitch = a* (anglePitch + gyrData * looptime) + (1-a) * (accData);
 
@@ -188,7 +196,7 @@ static void ComplementaryFilter1orderPitch(float accData, float gyrData, float l
 		indexPitch = 0U;
 	}
 	imu.angles.tangage = (Int16S)(totalPitch / NB_SMOOTH_PITCH);
-	imu.angles.tangage = imu.angles.tangage * 10U;
+	//imu.angles.tangage = imu.angles.tangage * 10U;
 }
 
 /************************************************************************/

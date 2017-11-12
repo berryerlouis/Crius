@@ -20,7 +20,7 @@
 #define SERVO_ANGLE_MAX			1800U
 
 #define PULSE_WIDTH_MIN			500U	//탎
-#define PULSE_WIDTH_MID			1500U	//탎
+#define PULSE_WIDTH_MID			1400U	//탎
 #define PULSE_WIDTH_MAX			2300U	//탎
 
 #define PERIOD_SERVO_MAX		15000U  //탎
